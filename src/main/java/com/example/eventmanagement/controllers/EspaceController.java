@@ -26,6 +26,9 @@ public class EspaceController {
     public String showRegisterForm(HttpSession session, Model model) {
         // Récupérer l'ID du prestataire connecté
         Long prestataireId = (Long) session.getAttribute("prestataireId");
+        String prestataireNom = (String) session.getAttribute("prestataireNom");
+
+        model.addAttribute("prestataireNom", prestataireNom);
         model.addAttribute("espaceEvenement", new EspaceEvenement());
 
         if (prestataireId == null) {
@@ -36,7 +39,7 @@ public class EspaceController {
         // Initialiser un objet EspaceEvenement vide pour remplir le formulaire
 
 
-        return "utilisateur/registerespace"; // Nom de la page contenant le formulaire
+        return "utilisateur/profileprestataire"; // Nom de la page contenant le formulaire
     }
 
     @PostMapping("/utilisateur/prestataire/registerespace")

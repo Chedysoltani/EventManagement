@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de Bord Prestataire</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            background-color: #f4f4f4;
+        }
+
+        .dashboard-container {
+            display: flex;
+            width: 100%;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            height: 100vh;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .menu ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .menu li {
+            margin: 20px 0;
+        }
+
+        .menu a {
+            text-decoration: none;
+            color: white;
+            padding: 10px;
+            display: block;
+            border-radius: 8px;
+            transition: background-color 0.3s;
+        }
+
+        .menu a:hover {
+            background-color: #34495e;
+        }
+
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        section {
+            background-color: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #2c3e50;
+        }
+
+        form label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        form input[type="text"], form input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        form button {
+            margin-top: 15px;
+            background-color: #2c3e50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        form button:hover {
+            background-color: #34495e;
+        }
+        
+    </style>
+</head>
+<body>
+<div class="dashboard-container">
+    <aside class="sidebar">
+        <div class="logo">YoYo InspireSpace</div>
+        <nav class="menu">
+            <ul>
+                <li><a href="#ajouter-espace">Ajouter un Espace</a></li>
+                <li><a href="#gerer-compte">Gérer le Compte</a></li>
+                <li><a href="#gerer-photos">Gérer les Photos</a></li>
+                <li><a href="/deconnexion">Déconnexion</a></li>
+            </ul>
+        </nav>
+    </aside>
+    <main class="content">
+        <header>
+            <h1>Bienvenue, <span th:text="${prestataireNom}"></span></h1>
+
+        </header>
+
+        <div class="container">
+            <header>Ajouter Votre Espace</header>
+            <form th:action="@{/utilisateur/prestataire/registerespace}" th:object="${espaceEvenement}" method="post">
+                <input type="hidden" th:field="*{prestataire.id}" />
+
+                <div class="fields">
+                    <!-- Informations générales -->
+                    <div class="input-field">
+                        <label>Nom complet</label>
+                        <input type="text" th:field="${espaceEvenement.nomComplet}" placeholder="Entrez le nom complet" required />
+                    </div>
+
+
+
+                    <div class="input-field">
+                        <label>Type d'espace</label>
+                        <select th:field="*{typeEspace}" required>
+                            <option value="cafe">Café</option>
+                            <option value="restaurant">Restaurant</option>
+                            <option value="salle">Salle de fête</option>
+                        </select>
+                    </div>
+
+                    <div class="input-field">
+                        <label>Capacité (nombre de personnes)</label>
+                        <input type="number" th:field="*{capacite}" placeholder="Capacité" required />
+                    </div>
+
+                    <!-- Services et coûts -->
+                    <div class="input-field">
+                        <label>Décoration (Prix par personne)</label>
+                        <input type="number" th:field="*{prixDecoration}" placeholder="Prix décoration" required />
+                    </div>
+                    <div class="input-field">
+                        <label>Photographie (Prix par personne)</label>
+                        <input type="number" th:field="*{prixPhotographie}" placeholder="Prix photographie" required />
+                    </div>
+                    <div class="input-field">
+                        <label>Boissons (Prix par personne)</label>
+                        <input type="number" th:field="*{prixBoissons}" placeholder="Prix boissons" required />
+                    </div>
+                    <div class="input-field">
+                        <label>Buffet (Prix par personne)</label>
+                        <input type="number" th:field="*{prixBuffet}" placeholder="Prix buffet" required />
+                    </div>
+
+                    <!-- Champ pour nombre de personnes et coût total -->
+                    <div class="input-field">
+                        <label>Nombre de personnes</label>
+                        <input type="number" id="nombrePersonnes" placeholder="Nombre de personnes" required />
+                    </div>
+                    <div class="input-field">
+                        <label>Coût total</label>
+                        <input type="text" id="coutTotal" placeholder="Coût total" readonly />
+                    </div>
+                </div>
+
+                <button type="submit">Soumettre</button>
+            </form>
+        </div>
+        <script>
+            function calculerCoutTotal() {
+                const n = parseInt(document.getElementById('nombrePersonnes').value) || 0;
+                const prixDecoration = parseFloat(document.getElementById('prixDecoration').value) || 0;
+                const prixPhotographie = parseFloat(document.getElementById('prixPhotographie').value) || 0;
+                const prixBoissons = parseFloat(document.getElementById('prixBoissons').value) || 0;
+                const prixBuffet = parseFloat(document.getElementById('prixBuffet').value) || 0;
+
+                const total = n * (prixDecoration + prixPhotographie + prixBoissons + prixBuffet);
+                document.getElementById('coutTotal').value = total.toFixed(2) + " TND";
+            }
+
+            // Ajouter des écouteurs d'événements pour recalculer à chaque modification
+            document.getElementById('nombrePersonnes').addEventListener('input', calculerCoutTotal);
+            document.getElementById('prixDecoration').addEventListener('input', calculerCoutTotal);
+            document.getElementById('prixPhotographie').addEventListener('input', calculerCoutTotal);
+            document.getElementById('prixBoissons').addEventListener('input', calculerCoutTotal);
+            document.getElementById('prixBuffet').addEventListener('input', calculerCoutTotal);
+        </script>
+
+
+        <section id="gerer-compte">
+            <h2>Gérer le Compte</h2>
+            <form>
+                <!-- Formulaire pour modifier les informations du compte -->
+                <label>Nom :</label>
+                <input type="text" placeholder="Nom" required />
+                <!-- Autres champs... -->
+                <button type="submit">Mettre à jour</button>
+            </form>
+        </section>
+
+        <section id="gerer-photos">
+            <h2>Gérer les Photos</h2>
+            <form enctype="multipart/form-data">
+                <label>Ajouter des photos :</label>
+                <input type="file" multiple />
+                <button type="submit">Télécharger</button>
+            </form>
+            <!-- Liste des photos existantes... -->
+        </section>
+    </main>
+</div>
+
+</body>
+</html>
