@@ -135,5 +135,6 @@ public class EspaceEvenement {
     public void setPrestataire(Prestataire prestataire) {
         this.prestataire = prestataire;
     }
+    
 }
 
